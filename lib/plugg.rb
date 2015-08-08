@@ -6,7 +6,7 @@ module Plugg
   # Set the source directory to load the plugins from
   #
   # @param mixed path
-  def Plug.source(path)
+  def Plugg.source(path)
 
     load_path = []
 
@@ -33,7 +33,7 @@ module Plugg
   # Get the current registry
   #
   # @return array
-  def Plug.registry
+  def Plugg.registry
     Dispatcher.instance.registry
   end
 
@@ -43,7 +43,7 @@ module Plugg
   # @param symbol evt
   # @param hash params
   # @return mixed
-  def Plug.send(evt, params = {})
+  def Plugg.send(evt, params = {})
     Dispatcher.instance.on(evt, params)
   end
 
