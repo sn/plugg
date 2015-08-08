@@ -20,29 +20,35 @@ Getting Started
 
 It's really simple to get Plugg running, after the installation, you simple require it and set the source directory where the plugin classes should be loaded from. You can also specify more than one source directory by passing an array to the *Plugg.source(path)* method. Once caveat is that plugin class names should match the plugin file names exactly.
 
-    require 'plugg'
+```ruby
+require 'plugg'
 
-    Plugg.source('./plugin') # or Plug.source(['./plugin1', './plugin2'])
+Plugg.source('./plugin') # or Plug.source(['./plugin1', './plugin2'])
 
-    result = Plugg.send(:test_method)
+result = Plugg.send(:test_method)
+```
 
 In the above example, you are sending the *:test_method* message to each plugin class in loaded registry and returning the output from each of these calls in an array (result).
 
 The *:test_method* message should correspond to a method with the same name in the plugin class:
 
-    class DemoPlugin
-      def test_method
-        puts "Inside test_method"
-      end
+```ruby
+class DemoPlugin
+  def test_method
+    puts "Inside test_method"
+  end
 
-      def to_s
-        "Demo Plugin"
-      end
-    end
+  def to_s
+    "Demo Plugin"
+  end
+end
+```
 
 You can also pass any number of arguments to the plugin methods:
 
-    result = Plugg.send(:test_method, arg1, arg2 arg3, etc)
+```ruby
+result = Plugg.send(:test_method, arg1, arg2 arg3, etc)
+```
 
 License
 -----------------
