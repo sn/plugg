@@ -53,25 +53,3 @@ Author
 -----------------
 
 Sean Nieuwoudt, [@seannieuwoudt](https://twitter.com/seannieuwoudt) / [http://isean.co.za](http://isean.co.za) / [https://wixelhq.com](https://wixelhq.com)
-
-
-
-
-
-
-
-Install
-Run
-test
-Contributing
-Class names must match file names entirely
-
-
-
-require 'pp'
-
-Plug.source('../plugins')
-
-result = Plug.send(:test)
-
-pp result
