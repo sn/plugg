@@ -1,5 +1,8 @@
 ## Plugg: A bolt-on Ruby plugin framework
 
+[![Gem Version](https://badge.fury.io/rb/plugg.svg)](https://rubygems.org/gems/plugg)
+[![Build Status](https://travis-ci.org/Wixel/Plugg.svg)](https://travis-ci.org/Wixel/Plugg)
+
 Simple, efficient plugin framework for your Ruby applications.
 
 Plugg works by loading all plugin files from a specified path and saving instances of each plugin to a registry which handles dispatching messages to the classes. You can
@@ -65,6 +68,12 @@ You can return anything you need from your plugin methods and can easily access 
 ]
 ```
 
+Running the tests
+-----------------
+
+To test the current stable version of Plugg, simple run:
+
+    rake test
 
 License
 -----------------
