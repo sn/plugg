@@ -23,7 +23,7 @@ It's really simple to get Plugg running, after the installation, you simple requ
 ```ruby
 require 'plugg'
 
-Plugg.source('./plugin') # or Plug.source(['./plugin1', './plugin2'])
+Plugg.source('./plugin') # or Plugg.source(['./plugin1', './plugin2'])
 
 result = Plugg.send(:test_method)
 ```
@@ -49,6 +49,22 @@ You can also pass any number of arguments to the plugin methods:
 ```ruby
 result = Plugg.send(:test_method, arg1, arg2 arg3, etc)
 ```
+
+Execution result
+-----------------
+
+You can return anything you need from your plugin methods and can easily access the return data inspecting the result from *Plugg.send()* method:
+
+```ruby
+[
+  {
+    :plugin => "Demo Plugin",
+    :return => nil,
+    :timing => 0.013
+  }
+]
+```
+
 
 License
 -----------------
