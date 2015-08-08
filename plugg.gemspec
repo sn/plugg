@@ -10,5 +10,6 @@ Gem::Specification.new do |s|
   s.license     = "GPL2"
   s.homepage    = 'https://wixelhq.com'
 
-  s.add_dependency 'rake', '~> 10.4', '>= 10.4.2'
+  s.add_development_dependency 'minitest', '~> 5.7', '>= 5.7.0'
+  s.add_development_dependency 'rake', '~> 10.4', '>= 10.4.2'
 end
