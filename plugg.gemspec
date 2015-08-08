@@ -9,4 +9,6 @@ Gem::Specification.new do |s|
   s.files       = ["lib/plugg.rb"]
   s.license     = "GPL2"
   s.homepage    = 'https://wixelhq.com'
+
+  s.add_dependency 'rake', '~> 10.4', '>= 10.4.2'
 end
