@@ -7,7 +7,7 @@ class PlugTest < Minitest::Test
   end
 
   def test_registry_load
-    assert_equal 1, Plugg.registry.length
+    assert_equal 2, Plugg.registry.length
   end
 
   def test_instance
