@@ -19,7 +19,7 @@ module Plugg
         File.directory?(p)
       end
 
-      load_path.concat path
+      load_path.concat(path)
     end
 
     if load_path.empty?

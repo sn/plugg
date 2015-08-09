@@ -5,8 +5,9 @@
 
 Simple, efficient plugin framework for your Ruby applications.
 
-Plugg works by loading all plugin files from a specified path and saving instances of each plugin to a registry which handles dispatching messages to the classes. You can
-use any class as a plugin as there are no external dependencies.
+Plugg works by loading all plugin files from a specified path and saving instances of each plugin to a singleton registry which handles dispatching messages to the classes. If the plugin class supports the message, it's response is added to a return buffer.
+
+Any Ruby class can be used as a plugin, there are no external dependencies.
 
 Requirements
 -----------------
@@ -31,9 +32,11 @@ Plugg.source('./plugin') # or Plugg.source(['./plugin1', './plugin2'])
 result = Plugg.send(:test_method)
 ```
 
-In the above example, you are sending the *:test_method* message to each plugin class in loaded registry and returning the output from each of these calls in an array (result).
+In the above example, you are sending the *:test_method* message to each plugin class in the loaded registry and returning the output from each of these calls in an array (result).
 
 The *:test_method* message should correspond to a method with the same name in the plugin class:
+
+    cat DemoPlugin.rb
 
 ```ruby
 class DemoPlugin
@@ -47,7 +50,7 @@ class DemoPlugin
 end
 ```
 
-You can also pass any number of arguments to the plugin methods:
+You can also pass any number of arguments to the plugin methods when they are called:
 
 ```ruby
 result = Plugg.send(:test_method, arg1, arg2 arg3, etc)
@@ -68,10 +71,12 @@ You can return anything you need from your plugin methods and can easily access 
 ]
 ```
 
+The power of Plugg starts revealing itself when you are running many plugins with many different methods. 
+
 Running the tests
 -----------------
 
-To test the current stable version of Plugg, simple run:
+To test the current stable version of Plugg, simply run:
 
     rake test
 
