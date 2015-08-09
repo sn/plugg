@@ -3,7 +3,7 @@ require 'plugg'
 
 class PlugTest < Minitest::Test
   def setup
-    Plugg.source(['./plugins', './does-not-exist'])
+    Plugg.source(['./examples', './does-not-exist'])
   end
 
   def test_registry_load
