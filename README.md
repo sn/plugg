@@ -56,7 +56,7 @@ You can also pass any number of arguments to the plugin methods when they are ca
 result = Plugg.send(:test_method, arg1, arg2 arg3, etc)
 ```
 
-Plugin Parameters
+Default Parameters
 -----------------
 
 If you wish to share default parameters or arguments with your plugins, you can do so by passing a hash as the second parameter of _Plugg.source()_.
