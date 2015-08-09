@@ -3,16 +3,16 @@
 [![Gem Version](https://badge.fury.io/rb/plugg.svg)](https://rubygems.org/gems/plugg)
 [![Build Status](https://travis-ci.org/Wixel/Plugg.svg)](https://travis-ci.org/Wixel/Plugg)
 
-Simple, efficient plugin framework for your Ruby applications.
+Simple & efficient plugin framework for Ruby applications.
 
-Plugg works by loading all plugin files from a specified path and saving instances of each plugin to a singleton registry which handles dispatching messages to the classes. If the plugin class supports the message, it's response is added to a return buffer.
+Plugg automatically loads all plugins from the paths you specify and creates instances of each inside an internal registry. When you send messages to Plugg, it relays those messages to each plugin that can respond to the message. Once all plugins have responded, it hands back an array containing the output from each plugin.
 
-Any Ruby class can be used as a plugin, there are no external dependencies.
+Any Ruby class can be used as a plugin because there are no external dependencies to implement.
 
 Requirements
 -----------------
 
-We recommend that you use Ruby 2.0.0 or higher.
+It's recommend that you use Ruby 2.0.0 or higher.
 
 Installation
 -----------------
@@ -22,14 +22,14 @@ Installation
 Getting Started
 -----------------
 
-It's really simple to get Plugg running, after the installation, you simple require it and set the source directory where the plugin classes should be loaded from. You can also specify more than one source directory by passing an array to the *Plugg.source(path)* method. Once caveat is that plugin class names should match the plugin file names exactly.
+It's really simple to get Plugg running, after the installation, you simple require it and set the source directory where the plugin classes should be loaded from. You can also specify more than one source directory by passing an array to the *Plugg.source(path)* method instead of a string path. One caveat is that plugin class names should match the plugin file names exactly.
 
 ```ruby
 require 'plugg'
 
-Plugg.source('./plugin') # or Plugg.source(['./plugin1', './plugin2'])
+Plugg.source('./plugins') # or Plugg.source(['./plugins1', './plugins2'])
 
-result = Plugg.send(:test_method)
+result = Plugg.send(:test_method, "a parameter")
 ```
 
 In the above example, you are sending the *:test_method* message to each plugin class in the loaded registry and returning the output from each of these calls in an array (result).
@@ -40,8 +40,8 @@ The *:test_method* message should correspond to a method with the same name in t
 
 ```ruby
 class DemoPlugin
-  def test_method
-    puts "Inside test_method"
+  def test_method(param)
+    puts "Inside test_method with #{param}"
   end
 
   def to_s
@@ -56,7 +56,37 @@ You can also pass any number of arguments to the plugin methods when they are ca
 result = Plugg.send(:test_method, arg1, arg2 arg3, etc)
 ```
 
-Execution result
+Plugin Parameters
+-----------------
+
+If you wish to share default parameters or arguments with your plugins, you can do so by passing a hash as the second parameter of _Plugg.source()_.
+
+```ruby
+Plugg.source("./plugins", {
+  :param1 => "A value",
+  :param2 => "Another value"
+})
+```
+
+To be able to inject the parameter hash from the registry into your plugin class, you need to implement a _set_params(p)_ method:
+
+```ruby
+class DemoPlugin
+  def test_method(param)
+    puts "Inside test_method with #{param}"
+  end
+
+  def set_params(p)
+    @params = p
+  end
+
+  def to_s
+    "Demo Plugin"
+  end
+end
+```
+
+Return value
 -----------------
 
 You can return anything you need from your plugin methods and can easily access the return data inspecting the result from *Plugg.send()* method:
@@ -71,7 +101,7 @@ You can return anything you need from your plugin methods and can easily access 
 ]
 ```
 
-The power of Plugg starts revealing itself when you are running many plugins with many different methods. 
+The power of Plugg starts revealing itself when you are running many plugins with many different methods.
 
 Running the tests
 -----------------

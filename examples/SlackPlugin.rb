@@ -10,6 +10,10 @@ class SlackPlugin
     }.to_json)
   end
 
+  def set_params(p)
+    puts "Inside set_params"
+  end
+
   def to_s
     "Slack Plugin"
   end

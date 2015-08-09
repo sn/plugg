@@ -3,7 +3,10 @@ require 'plugg'
 
 class PlugTest < Minitest::Test
   def setup
-    Plugg.source(['./examples', './does-not-exist'])
+    Plugg.source(['./examples', './does-not-exist'], {
+      :param   => "Parameter 1",
+      :another => "Paramter 2"
+    })
   end
 
   def test_registry_load

@@ -5,8 +5,9 @@ module Plugg
   ##
   # Set the source directory to load the plugins from
   #
+  # @param hash params
   # @param mixed path
-  def Plugg.source(path)
+  def Plugg.source(path, params = {})
 
     load_path = []
 
@@ -26,7 +27,7 @@ module Plugg
       raise "Plugin load paths contain no valid directories"
     end
 
-    Dispatcher.plugin_path = load_path
+    Dispatcher.start(load_path, params)
   end
 
   ##
@@ -43,8 +44,8 @@ module Plugg
   # @param symbol evt
   # @param hash params
   # @return mixed
-  def Plugg.send(evt, params = {})
-    Dispatcher.instance.on(evt, params)
+  def Plugg.send(evt)
+    Dispatcher.instance.on(evt)
   end
 
   class Dispatcher
@@ -53,14 +54,17 @@ module Plugg
     attr_reader :registry
 
     @@plugin_path = []
+    @@params = {}
 
     ##
     # Assign a path where plugins should be loaded from
   	#
-  	# @param string path
+  	# @param mixed path
+    # @param hash params
   	# @return void
-    def self.plugin_path=(path)
+    def self.start(path, params = {})
       @@plugin_path = path
+      @@params = params
     end
 
     ##
@@ -80,11 +84,19 @@ module Plugg
           require File.expand_path(f)
 
           begin
+            instance = Object.const_get(File.basename(f, '.rb')).new
+
+            if instance.respond_to?(:set_params)
+              instance.send(:set_params, @@params)
+            end
+
       			@registry.push(
-      				Object.const_get(File.basename(f, '.rb')).new
+              instance
       			)
+
+            instance = nil
           rescue Exception => e
-            puts "#{f} Initialization Exception."
+            puts "#{f} Initialization Exception: #{e}"
           end
     		end
       end
@@ -97,6 +109,10 @@ module Plugg
   	# @return void
   	def on(method, *args, &block)
       buffer = []
+
+      if [:initialize, :set_params].include? method
+        raise "#{method} should not be called this way"
+      end
 
   		@registry.each do |s|
   			if s.respond_to?(method.to_sym, include_private = false)
