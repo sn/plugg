@@ -44,8 +44,8 @@ module Plugg
   # @param symbol evt
   # @param hash params
   # @return mixed
-  def Plugg.send(evt)
-    Dispatcher.instance.on(evt)
+  def Plugg.send(evt, params = {})
+    Dispatcher.instance.on(evt, params)
   end
 
   class Dispatcher
@@ -115,7 +115,7 @@ module Plugg
       end
 
   		@registry.each do |s|
-  			if s.respond_to?(method.to_sym, include_private = false)
+  			if s.respond_to?(method.to_sym, false)
 
           start = Time.now
           response = nil
