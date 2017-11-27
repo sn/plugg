@@ -29,10 +29,6 @@ require 'plugg'
 
 Plugg.source('./plugins') # or Plugg.source(['./plugins1', './plugins2'])
 
-# Plugg.setup do
-#   # Build any helper functions here?
-# end
-
 result = Plugg.send(:test_method, 'a parameter')
 ```
 
