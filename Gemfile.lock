@@ -1,0 +1,21 @@
+PATH
+  remote: .
+  specs:
+    plugg (0.0.4)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    minitest (5.10.3)
+    rake (10.5.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  minitest (~> 5.7, >= 5.7.0)
+  plugg!
+  rake (~> 10.4, >= 10.4.2)
+
+BUNDLED WITH
+   1.16.0

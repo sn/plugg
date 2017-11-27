@@ -3,17 +3,19 @@ require 'plugg'
 
 class PlugTest < Minitest::Test
   def setup
-    Plugg.source(['./examples', './does-not-exist'], {
-      :param   => "Parameter 1",
-      :another => "Paramter 2"
+    Plugg.timeout(120)
+
+    Plugg.source('./examples', {
+      param:   'Parameter 1',
+      another: 'Paramter 2'
     })
   end
 
   def test_registry_load
-    assert_equal 2, Plugg.registry.length
+    assert_equal 1, Plugg.registry.length
   end
 
-  def test_instance
+  def test_response
     response = Plugg.send(:test_method)
 
     assert_instance_of Array, response

@@ -1,7 +1,7 @@
 require 'singleton'
+require 'timeout'
 
 module Plugg
-
   ##
   # Set the source directory to load the plugins from
   #
@@ -24,10 +24,18 @@ module Plugg
     end
 
     if load_path.empty?
-      raise "Plugin load paths contain no valid directories"
+      raise 'Unable to locate plugins in the provided load path'
     end
 
-    Dispatcher.start(load_path, params)
+    Dispatcher.instance.start(load_path, params)
+  end
+
+  ##
+  # Set the dispatch plugin timeout value
+  #
+  # @param integer t
+  def Plugg.timeout(t = 30)
+    Dispatcher.instance.set_timeout(t)
   end
 
   ##
@@ -45,16 +53,16 @@ module Plugg
   # @param hash params
   # @return mixed
   def Plugg.send(evt, params = {})
-    Dispatcher.instance.on(evt, params)
+    Dispatcher.instance.on(evt.to_sym, params)
   end
+
+  private
 
   class Dispatcher
     include Singleton
 
     attr_reader :registry
-
-    @@plugin_path = []
-    @@params = {}
+    attr_accessor :timeout
 
     ##
     # Assign a path where plugins should be loaded from
@@ -62,19 +70,10 @@ module Plugg
   	# @param mixed path
     # @param hash params
   	# @return void
-    def self.start(path, params = {})
-      @@plugin_path = path
-      @@params = params
-    end
-
-    ##
-    # Initialize the dispatcher and load the plugin instances
-  	#
-  	# @return void
-    def initialize
+    def start(paths, params = {})
       @registry = []
 
-      @@plugin_path.each do |path|
+      paths.each do |path|
         if path[-1] == '/'
           path.chop!
         end
@@ -86,20 +85,35 @@ module Plugg
           begin
             instance = Object.const_get(File.basename(f, '.rb')).new
 
-            if instance.respond_to?(:set_params)
-              instance.send(:set_params, @@params)
+            if instance.respond_to?(:setup)
+              instance.send(:setup, params)
             end
 
-      			@registry.push(
-              instance
-      			)
+      			@registry.push(instance)
 
             instance = nil
           rescue Exception => e
-            puts "#{f} Initialization Exception: #{e}"
+            puts "#{f} Plugg Initialization Exception: #{e}"
           end
     		end
       end
+    end
+
+    ##
+    # Set the the thread execution timeout
+  	#
+  	# @param integer t
+  	# @return void
+    def set_timeout(t)
+      @timeout = t
+    end
+
+    ##
+    # Initialize the dispatcher instance
+  	#
+  	# @return void
+    def initialize
+      @timeout = 30
     end
 
     ##
@@ -110,33 +124,45 @@ module Plugg
   	def on(method, *args, &block)
       buffer = []
 
-      if [:initialize, :set_params].include? method
-        raise "#{method} should not be called this way"
+      if [:initialize, :setup].include? method
+        raise "#{method} should not be called directly"
       end
+
+      threads = []
 
   		@registry.each do |s|
   			if s.respond_to?(method.to_sym, false)
 
-          start = Time.now
-          response = nil
+          start_time = Time.now
 
           begin
-            if s.method(method.to_sym).arity == 0
-              response = s.send(method, &block)
-            else
-              response = s.send(method, *args, &block)
+        		threads << Thread.new do
+              status   = true
+              response = nil
+
+              Timeout::timeout(@timeout) {
+                if s.method(method.to_sym).arity == 0
+                  response = s.send(method, &block)
+                else
+                  response = s.send(method, *args, &block)
+                end
+              }
+
+              buffer << {
+                plugin: s.to_s,
+                return: response,
+                timing: (Time.now - start_time) * 1000,
+                success: status
+              }
             end
           rescue Exception => e
             response = e
+            status = false
           end
-
-          buffer << {
-            :plugin => s.to_s,
-            :return => response,
-            :timing => (Time.now - start) * 1000
-          }
   			end
   		end
+
+      threads.map(&:join)
 
       buffer
   	end
