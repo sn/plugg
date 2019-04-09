@@ -31,6 +31,8 @@ require 'plugg'
 Plugg.source('./plugins') # or Plugg.source(['./plugins1', './plugins2'])
 
 result = Plugg.send(:test_method, 'a parameter')
+
+result = Plugg.send('/about', request)
 ```
 
 In the above example, you are sending the *:test_method* message to each loaded plugin and returning the output from each of these calls in an array to the `result` variable.

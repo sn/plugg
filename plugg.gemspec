@@ -2,8 +2,8 @@ Gem::Specification.new do |s|
   s.name        = 'plugg'
   s.version     = '1.0.0'
   s.date        = '2019-04-06'
-  s.summary     = 'Plugg is an independent plugin creation framework and DSL'
-  s.description = 'Plugg allows you to easily extend your application by providing you with a bolt-on plugin framework'
+  s.summary     = 'Plugg is a an asynchronous DSL for creating performant plugins'
+  s.description = 'Plugg allows you to easily extend your application by providing you with a plug and play plugin framework'
   s.authors     = ['Sean Nieuwoudt']
   s.email       = 'sean@isean.co.za'
   s.files       = ['lib/plugg.rb']

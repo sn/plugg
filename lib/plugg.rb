@@ -1,9 +1,10 @@
 require 'singleton'
 require 'timeout'
+require 'ostruct'
 
 module Plugg
   ##
-  # Set the source directory to load the plugins from
+  # Set the source directory to load the plugins & dependencies from
   #
   # @param hash params
   # @param mixed path
@@ -24,7 +25,7 @@ module Plugg
     end
 
     if load_path.empty?
-      raise 'Unable to locate plugins in the provided load path'
+      raise 'Unable to locate plugins in the provided load paths'
     end
 
     Dispatcher.instance.start(load_path, params)
@@ -58,6 +59,58 @@ module Plugg
 
   private
 
+  class DispatchResponder
+    attr_reader :plugin
+    attr_reader :meta
+    
+    def initialize(plugin = nil)
+      @meta = OpenStruct.new
+
+      @meta.start_time = Time.now
+      @meta.plugin     = plugin
+      @meta.response   = nil
+      @meta.runtime    = nil
+      @meta.error      = nil
+    end
+
+    def trap(timeout = 5)
+      Timeout::timeout(timeout) {
+        begin  
+          @meta.response = yield
+        rescue Exception => e
+          @meta.error = e
+        end
+      }
+
+      @meta.runtime = (Time.now - @start_time) * 1000
+    end
+
+    def finalize
+      if @meta.plugin.respond_to?(:after)
+        @meta.plugin.send(:after) 
+      end
+    end
+
+    def ok? 
+      @meta.error.nil?
+    end
+
+    def error
+      @meta.error
+    end
+
+    def to_h
+      defaults = {
+        plugin:   @meta.plugin.to_s,
+        runtime:  @meta.runtime,
+        response: @meta.error,
+        success:  ok?
+      }
+
+      defaults
+    end
+  end
+
   class Dispatcher
     include Singleton
 
@@ -85,13 +138,18 @@ module Plugg
           begin
             instance = Object.const_get(File.basename(f, '.rb')).new
 
+            # `before` event callback
+            if instance.respond_to?(:before)
+              instance.send(:before)
+            end
+
+            # `setup` method
             if instance.respond_to?(:setup)
               instance.send(:setup, params)
             end
 
-      			@registry.push(instance)
-
-            instance = nil
+            @registry.push(instance)
+            
           rescue Exception => e
             puts "#{f} Plugg Initialization Exception: #{e}"
           end
@@ -109,11 +167,11 @@ module Plugg
     end
 
     ##
-    # Initialize the dispatcher instance
+    # Initialize the dispatcher instance with a default timeout of 5s
   	#
   	# @return void
     def initialize
-      @timeout = 30
+      @timeout = 5
     end
 
     ##
@@ -122,42 +180,30 @@ module Plugg
   	# @param string method
   	# @return void
   	def on(method, *args, &block)
-      buffer = []
 
-      if [:initialize, :setup].include? method
+      if [:initialize, :before, :setup, :after].include? method
         raise "#{method} should not be called directly"
       end
 
-      threads = []
+      buffer  = [] # Container for the response buffer  
+      threads = [] # Container for the execution threads
 
   		@registry.each do |s|
-  			if s.respond_to?(method.to_sym, false)
-
-          start_time = Time.now
-
-          begin
-        		threads << Thread.new do
-              status   = true
-              response = nil
-
-              Timeout::timeout(@timeout) {
-                if s.method(method.to_sym).arity == 0
-                  response = s.send(method, &block)
-                else
-                  response = s.send(method, *args, &block)
-                end
-              }
-
-              buffer << {
-                plugin: s.to_s,
-                return: response,
-                timing: (Time.now - start_time) * 1000,
-                success: status
-              }
+        if s.respond_to?(method.to_sym, false)
+          threads << Thread.new do 
+            responder = DispatchResponder.new(s)
+          
+            responder.trap(@timeout) do 
+              if s.method(method.to_sym).arity == 0
+                s.send(method, &block)
+              else
+                s.send(method, *args, &block)
+              end
             end
-          rescue Exception => e
-            response = e
-            status = false
+
+            responder.finalize
+
+            buffer << responder.to_h
           end
   			end
   		end
