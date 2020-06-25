@@ -129,4 +129,4 @@ Please see [LICENSE](https://github.com/SeanNieuwoudt/plugg/blob/master/LICENSE)
 Author
 -----------------
 
-Sean Nieuwoudt, [@seannieuwoudt](https://twitter.com/seannieuwoudt) / [http://isean.co.za](http://isean.co.za)
+[github.com/sn](https://github.com/sn) 
