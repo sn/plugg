@@ -1,13 +1,13 @@
 PATH
   remote: .
   specs:
-    plugg (0.0.4)
+    plugg (1.0.1)
 
 GEM
   remote: https://rubygems.org/
   specs:
     minitest (5.10.3)
-    rake (10.5.0)
+    rake (12.3.3)
 
 PLATFORMS
   ruby
@@ -15,7 +15,7 @@ PLATFORMS
 DEPENDENCIES
   minitest (~> 5.7, >= 5.7.0)
   plugg!
-  rake (~> 10.4, >= 10.4.2)
+  rake (~> 12.3)
 
 BUNDLED WITH
    1.16.0

@@ -11,5 +11,5 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/sn/plugg'
   
   s.add_development_dependency 'minitest', '~> 5.7', '>= 5.7.0'
-  s.add_development_dependency 'rake', '~> 13.0'
+  s.add_development_dependency 'rake', '~> 12.3'
 end
