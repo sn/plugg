@@ -1,4 +1,4 @@
-## Plugg: A dependency-free & asynchronous Ruby plugin framework
+## Plugg: A dependency-free plugin framework for Ruby applications
 
 [![Gem Version](https://badge.fury.io/rb/plugg.svg)](https://rubygems.org/gems/plugg)
 
@@ -124,7 +124,7 @@ To test the current stable version of Plugg, simply run:
 License
 -----------------
 
-Please see [LICENSE](https://github.com/SeanNieuwoudt/plugg/blob/master/LICENSE) for licensing details.
+Please see [LICENSE](https://github.com/sn/plugg/blob/master/LICENSE) for licensing details.
 
 Author
 -----------------
